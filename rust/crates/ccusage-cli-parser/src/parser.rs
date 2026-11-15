@@ -284,6 +284,13 @@ fn parse_command(
             STANDARD_AGENT_REPORTS,
             Command::Codebuff,
         ),
+        "devin" => parse_basic_agent_command(
+            parser,
+            shared,
+            "devin",
+            STANDARD_AGENT_REPORTS,
+            Command::Devin,
+        ),
         "hermes" => parse_basic_agent_command(
             parser,
             shared,
@@ -848,6 +855,7 @@ fn is_command(arg: &str) -> bool {
             | "amp"
             | "droid"
             | "codebuff"
+            | "devin"
             | "hermes"
             | "pi"
             | "goose"
@@ -1011,6 +1019,7 @@ fn is_agent_command(command: &str) -> bool {
             | "amp"
             | "droid"
             | "codebuff"
+            | "devin"
             | "hermes"
             | "pi"
             | "goose"
@@ -1035,7 +1044,7 @@ fn agent_report_supported(agent: &str, report: &str) -> bool {
         ),
         "codex" => matches!(report, "daily" | "monthly" | "session"),
         "opencode" | "cline" => matches!(report, "daily" | "weekly" | "monthly" | "session"),
-        "amp" | "droid" | "codebuff" | "hermes" | "pi" | "goose" | "kilo" | "copilot"
+        "amp" | "droid" | "codebuff" | "devin" | "hermes" | "pi" | "goose" | "kilo" | "copilot"
         | "gemini" | "antigravity" | "kimi" | "qwen" | "openclaw" | "grok" | "zcode" => {
             matches!(report, "daily" | "monthly" | "session")
         }
@@ -1051,6 +1060,7 @@ fn agent_display_name(agent: &str) -> &'static str {
         "amp" => "Amp",
         "droid" => "Droid",
         "codebuff" => "Codebuff",
+        "devin" => "Devin",
         "hermes" => "Hermes",
         "pi" => "pi-agent",
         "goose" => "Goose",
@@ -1139,6 +1149,7 @@ fn report_shared<'a>(
             | Command::Amp(args)
             | Command::Droid(args)
             | Command::Codebuff(args)
+            | Command::Devin(args)
             | Command::Hermes(args)
             | Command::Pi(args)
             | Command::Goose(args)

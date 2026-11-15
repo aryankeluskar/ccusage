@@ -70,6 +70,10 @@
 				"description": "Show Codebuff usage commands"
 			},
 			{
+				"name": "devin",
+				"description": "Show Devin usage commands"
+			},
+			{
 				"name": "hermes",
 				"description": "Show Hermes usage commands"
 			},
@@ -420,6 +424,43 @@
 			"path": ["codebuff", "session"],
 			"description": "Show Codebuff usage grouped by session",
 			"usage": "ccusage codebuff session <OPTIONS>",
+			"options": "agent_options"
+		},
+		{
+			"path": ["devin"],
+			"description": "Usage reports for devin.",
+			"usage": "ccusage devin <COMMANDS>",
+			"commands": [
+				{
+					"name": "daily",
+					"description": "Show Devin usage grouped by date"
+				},
+				{
+					"name": "monthly",
+					"description": "Show Devin usage grouped by month"
+				},
+				{
+					"name": "session",
+					"description": "Show Devin usage grouped by session"
+				}
+			]
+		},
+		{
+			"path": ["devin", "daily"],
+			"description": "Show Devin usage grouped by date",
+			"usage": "ccusage devin daily <OPTIONS>",
+			"options": "agent_period_options"
+		},
+		{
+			"path": ["devin", "monthly"],
+			"description": "Show Devin usage grouped by month",
+			"usage": "ccusage devin monthly <OPTIONS>",
+			"options": "agent_period_options"
+		},
+		{
+			"path": ["devin", "session"],
+			"description": "Show Devin usage grouped by session",
+			"usage": "ccusage devin session <OPTIONS>",
 			"options": "agent_options"
 		},
 		{

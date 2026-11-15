@@ -16,6 +16,7 @@ pub enum Command {
     Amp(AgentCommandArgs),
     Droid(AgentCommandArgs),
     Codebuff(AgentCommandArgs),
+    Devin(AgentCommandArgs),
     Hermes(AgentCommandArgs),
     Pi(AgentCommandArgs),
     Goose(AgentCommandArgs),

@@ -2,9 +2,9 @@
 
 ![ccusage daily report showing token usage and costs by date](/screenshot.png)
 
-**ccusage** is a local CLI for understanding coding (agent) CLI token usage and estimated costs across Claude Code, Codex, OpenCode, Amp, Droid, Codebuff, Cline, Hermes Agent, pi-agent, Goose, OpenClaw, Kilo, Kimi, Qwen, GitHub Copilot CLI, Gemini CLI, Antigravity, Grok Build CLI, and ZCode.
+**ccusage** is a local CLI for understanding coding (agent) CLI token usage and estimated costs across Claude Code, Codex, OpenCode, Amp, Droid, Codebuff, Devin CLI, Cline, Hermes Agent, pi-agent, Goose, OpenClaw, Kilo, Kimi, Qwen, GitHub Copilot CLI, Gemini CLI, Antigravity, Grok Build CLI, and ZCode.
 
-The original **“cc”** came from **C**laude **C**ode usage and now also fits **C**odex **C**LI usage. As OpenCode, Amp, Droid, Codebuff, Cline, Hermes Agent, pi-agent, Goose, OpenClaw, Kilo, Kimi, Qwen, Gemini CLI, Antigravity, Grok Build CLI, ZCode, and other coding (agent) CLIs became part of the same workflow, ccusage expanded into a general name for local coding CLI usage analysis.
+The original **“cc”** came from **C**laude **C**ode usage and now also fits **C**odex **C**LI usage. As OpenCode, Amp, Droid, Codebuff, Devin CLI, Cline, Hermes Agent, pi-agent, Goose, OpenClaw, Kilo, Kimi, Qwen, Gemini CLI, Antigravity, Grok Build CLI, ZCode, and other coding (agent) CLIs became part of the same workflow, ccusage expanded into a general name for local coding CLI usage analysis.
 
 ## The Problem
 
@@ -19,7 +19,7 @@ Modern coding (agent) CLI usage is split across several local data formats. That
 
 ccusage reads the local usage files that coding CLIs already generate and provides:
 
-- **All Sources by Default** - Claude Code, Codex, OpenCode, Amp, Droid, Codebuff, Cline, Hermes Agent, pi-agent, Goose, OpenClaw, Kilo, Kimi, Qwen, GitHub Copilot CLI, Gemini CLI, Antigravity, Grok Build CLI, and ZCode in one CLI
+- **All Sources by Default** - Claude Code, Codex, OpenCode, Amp, Droid, Codebuff, Devin CLI, Cline, Hermes Agent, pi-agent, Goose, OpenClaw, Kilo, Kimi, Qwen, GitHub Copilot CLI, Gemini CLI, Antigravity, Grok Build CLI, and ZCode in one CLI
 - **Usage Views** - Daily, weekly, monthly, and session-based breakdowns
 - **Cost Analysis** - Estimated costs based on token usage and model pricing
 - **Focused Data Source Views** - Start with all detected sources, then narrow the same usage views to one source when needed
@@ -80,6 +80,7 @@ ccusage reads from local coding CLI data directories:
 | Amp            | `amp`         | `${AMP_DATA_DIR:-~/.local/share/amp}`                                                                     |
 | Droid          | `droid`       | `${DROID_SESSIONS_DIR:-~/.factory/sessions}`                                                              |
 | Codebuff       | `codebuff`    | `${CODEBUFF_DATA_DIR:-~/.config/manicode}`                                                                |
+| Devin CLI      | `devin`       | `${DEVIN_DATA_DIR:-~/.local/share/devin}/cli/sessions.db` (also `${DEVIN_SESSIONS_DIR}/sessions.db`)        |
 | Cline          | `cline`       | `${CLINE_DATA_DIR}` or `~/.cline` and supported editor `globalStorage` roots                              |
 | Hermes Agent   | `hermes`      | `${HERMES_HOME:-~/.hermes}/state.db`                                                                      |
 | pi-agent       | `pi`          | `${PI_AGENT_DIR:-~/.pi/agent/sessions}`                                                                   |
@@ -99,7 +100,7 @@ For OpenCode, `${XDG_DATA_HOME:-$HOME/.local/share}/opencode` is the default-pat
 The tool automatically detects available data and aggregates all supported coding CLIs by default.
 Source-specific environment variables that support multiple roots can contain comma-separated directories, which lets unified reports combine current profiles and archives.
 
-Some coding agents have been investigated but are not supported because their local files do not contain reliable token usage. See [Source Support Q&A](/guide/source-support-qa) for the current notes on legacy Grok CLI SQLite data and Devin CLI.
+Some coding agents have been investigated but are not supported because their local files do not contain reliable token usage. See [Source Support Q&A](/guide/source-support-qa) for what a source needs and the history of previously investigated sources.
 
 ## Report Shape
 
@@ -121,6 +122,7 @@ ccusage opencode weekly
 ccusage amp session
 ccusage droid daily
 ccusage codebuff daily
+ccusage devin daily
 ccusage cline daily
 ccusage hermes daily
 ccusage pi monthly
@@ -153,8 +155,7 @@ For Claude Code-specific setup and features, start from the [Claude Code data so
 
 - **Local Files Only** - Only analyzes data from your current machine
 - **Language Model Tokens** - API calls for tools like Web Search are not included
-- **Estimate Accuracy** - Costs are estimates and may not reflect actual billing
-  :::
+- **Estimate Accuracy** - Costs are estimates and may not reflect actual billing :::
 
 ## Acknowledgments
 

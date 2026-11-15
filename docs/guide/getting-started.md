@@ -38,8 +38,7 @@ bunx -p https://pkg.pr.new/ccusage@<pr-number-or-commit-sha> ccusage --offline
 This will show your daily usage report for all detected supported coding CLIs by default.
 
 ::: tip Runtime
-[bunx](https://bun.com/docs/pm/bunx) caches the downloaded package, so repeated runs are faster after the first launch.
-:::
+[bunx](https://bun.com/docs/pm/bunx) caches the downloaded package, so repeated runs are faster after the first launch. :::
 
 Use a data source namespace when you want the same report focused on one source:
 
@@ -172,6 +171,7 @@ If ccusage shows no data, check:
    - Amp: `${AMP_DATA_DIR:-~/.local/share/amp}`
    - Droid: `${DROID_SESSIONS_DIR:-~/.factory/sessions}`
    - Codebuff: `${CODEBUFF_DATA_DIR:-~/.config/manicode}`
+   - Devin CLI: `${DEVIN_SESSIONS_DIR:-~/.local/share/devin/cli}/sessions.db`
    - Cline: `~/.cline/data/sessions/` and editor `globalStorage/saoudrizwan.claude-dev/tasks/`
    - Hermes Agent: `${HERMES_HOME:-~/.hermes}/state.db`
    - pi-agent: `${PI_AGENT_DIR:-~/.pi/agent/sessions}`
@@ -196,6 +196,8 @@ export OPENCODE_DATA_DIR="/path/to/opencode"
 export AMP_DATA_DIR="/path/to/amp"
 export DROID_SESSIONS_DIR="/path/to/factory/sessions"
 export CODEBUFF_DATA_DIR="/path/to/manicode"
+export DEVIN_SESSIONS_DIR="/path/to/devin/cli"
+export DEVIN_DATA_DIR="/path/to/devin"
 export CLINE_DATA_DIR="/path/to/cline,/path/to/Code/User/globalStorage/saoudrizwan.claude-dev"
 export HERMES_HOME="/path/to/hermes"
 export PI_AGENT_DIR="/path/to/pi/sessions"

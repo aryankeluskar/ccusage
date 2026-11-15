@@ -1827,6 +1827,216 @@ fn zcode_fixture_reports_daily_monthly_session_json_and_table_snapshots() {
     );
 }
 
+/// Creates a Devin sessions database covering three days and two sessions. The
+/// first request is inserted twice — a context rebuild re-saves it — so the
+/// report only counts it once.
+fn create_devin_fixture_db(db_path: &Path) {
+    let db = sqlite::open(db_path).unwrap();
+    db.execute(
+        "
+        CREATE TABLE sessions (
+            id TEXT PRIMARY KEY,
+            model TEXT,
+            working_directory TEXT
+        );
+        CREATE TABLE message_nodes (
+            row_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id TEXT NOT NULL,
+            created_at INTEGER NOT NULL,
+            chat_message TEXT NOT NULL
+        );
+        ",
+    )
+    .unwrap();
+    insert_devin_session(
+        &db,
+        "session-a",
+        "claude-opus-5-5-medium",
+        "/home/dev/project-a",
+    );
+    insert_devin_session(
+        &db,
+        "session-b",
+        "gpt-6-astra-medium",
+        "/home/dev/project-b",
+    );
+    insert_devin_message(
+        &db,
+        "session-a",
+        4_071_038_400,
+        "request-1",
+        [50, 10, 25, 15],
+    );
+    insert_devin_message(
+        &db,
+        "session-a",
+        4_071_042_000,
+        "request-1",
+        [50, 10, 25, 15],
+    );
+    insert_devin_message(
+        &db,
+        "session-a",
+        4_072_161_600,
+        "request-2",
+        [130, 20, 40, 30],
+    );
+    insert_devin_message(&db, "session-b", 4_073_630_400, "request-3", [40, 5, 10, 0]);
+}
+
+fn insert_devin_session(db: &sqlite::Connection, id: &str, model: &str, directory: &str) {
+    let mut statement = db
+        .prepare("INSERT INTO sessions VALUES (?1, ?2, ?3)")
+        .unwrap();
+    statement.bind((1, id)).unwrap();
+    statement.bind((2, model)).unwrap();
+    statement.bind((3, directory)).unwrap();
+    statement.next().unwrap();
+}
+
+/// Writes one assistant message; the model comes from the session row because
+/// `generation_model` is null, which is one of the fallbacks under test.
+fn insert_devin_message(
+    db: &sqlite::Connection,
+    session: &str,
+    created_at: i64,
+    request_id: &str,
+    tokens: [i64; 4],
+) {
+    let chat_message = serde_json::json!({
+        "role": "assistant",
+        "content": "done",
+        "metadata": {
+            "request_id": request_id,
+            "generation_model": null,
+            "metrics": {
+                "input_tokens": tokens[0],
+                "output_tokens": tokens[1],
+                "cache_read_tokens": tokens[2],
+                "cache_creation_tokens": tokens[3],
+            },
+        },
+    })
+    .to_string();
+    let mut statement = db
+        .prepare(
+            "INSERT INTO message_nodes (session_id, created_at, chat_message) VALUES (?1, ?2, ?3)",
+        )
+        .unwrap();
+    statement.bind((1, session)).unwrap();
+    statement.bind((2, created_at)).unwrap();
+    statement.bind((3, chat_message.as_str())).unwrap();
+    statement.next().unwrap();
+}
+
+#[test]
+fn devin_fixture_reports_daily_monthly_session_json_and_table_snapshots() {
+    let fixture = fs_fixture!({});
+    let _ = fixture.create_dir_all("devin-data/cli");
+    let db_path = fixture.path("devin-data/cli/sessions.db");
+    create_devin_fixture_db(&db_path);
+    let _env = isolated_agent_env(
+        &fixture,
+        "DEVIN_DATA_DIR",
+        fixture.path("devin-data").into_os_string(),
+    );
+    let mut shared = fixture_shared("20990101", "20990201");
+    shared.mode = CostMode::Calculate;
+
+    let daily = load_rows(
+        AgentReportKind::Daily,
+        &shared,
+        &NO_SOURCES,
+        WeekDay::Monday,
+    )
+    .unwrap();
+    let monthly = load_rows(
+        AgentReportKind::Monthly,
+        &shared,
+        &NO_SOURCES,
+        WeekDay::Monday,
+    )
+    .unwrap();
+    let session = load_rows(
+        AgentReportKind::Session,
+        &shared,
+        &NO_SOURCES,
+        WeekDay::Monday,
+    )
+    .unwrap();
+
+    assert_eq!(daily.detected_agents, vec!["devin"]);
+    assert_eq!(monthly.detected_agents, vec!["devin"]);
+    assert_eq!(session.detected_agents, vec!["devin"]);
+    assert_eq!(daily.rows.len(), 3);
+    assert_eq!(daily.rows[0].period, "2099-01-02");
+    assert_eq!(daily.rows[0].input_tokens, 50);
+    assert_eq!(daily.rows[0].output_tokens, 10);
+    assert_eq!(daily.rows[0].cache_creation_tokens, 15);
+    assert_eq!(daily.rows[0].cache_read_tokens, 25);
+    assert_eq!(daily.rows[0].total_tokens, 100);
+    assert_eq!(daily.rows[1].period, "2099-01-15");
+    assert_eq!(daily.rows[1].input_tokens, 130);
+    assert_eq!(daily.rows[1].output_tokens, 20);
+    assert_eq!(daily.rows[1].cache_creation_tokens, 30);
+    assert_eq!(daily.rows[1].cache_read_tokens, 40);
+    assert_eq!(daily.rows[1].total_tokens, 220);
+    assert_eq!(daily.rows[2].period, "2099-02-01");
+    assert_eq!(daily.rows[2].input_tokens, 40);
+    assert_eq!(daily.rows[2].output_tokens, 5);
+    assert_eq!(daily.rows[2].cache_creation_tokens, 0);
+    assert_eq!(daily.rows[2].cache_read_tokens, 10);
+    assert_eq!(daily.rows[2].total_tokens, 55);
+    assert_eq!(monthly.rows[0].period, "2099-01");
+    assert_eq!(monthly.rows[0].total_tokens, 320);
+    assert_eq!(monthly.rows[1].period, "2099-02");
+    assert_eq!(monthly.rows[1].total_tokens, 55);
+    assert_eq!(session.rows[0].period, "session-a");
+    assert_eq!(session.rows[0].total_tokens, 320);
+    assert_eq!(session.rows[1].period, "session-b");
+    assert_eq!(session.rows[1].total_tokens, 55);
+
+    insta::assert_json_snapshot!(
+        "devin_fixture_daily_json",
+        report_json(&daily.rows, AgentReportKind::Daily)
+    );
+    insta::assert_json_snapshot!(
+        "devin_fixture_monthly_json",
+        report_json(&monthly.rows, AgentReportKind::Monthly)
+    );
+    insta::assert_json_snapshot!(
+        "devin_fixture_session_json",
+        report_json(&session.rows, AgentReportKind::Session)
+    );
+    insta::assert_snapshot!(
+        "devin_fixture_daily_table",
+        serde_json::to_string_pretty(&table_snapshot(
+            &daily.rows,
+            AgentReportKind::Daily,
+            &daily.detected_agents,
+        ))
+        .unwrap()
+    );
+    insta::assert_snapshot!(
+        "devin_fixture_monthly_table",
+        serde_json::to_string_pretty(&table_snapshot(
+            &monthly.rows,
+            AgentReportKind::Monthly,
+            &monthly.detected_agents,
+        ))
+        .unwrap()
+    );
+    insta::assert_snapshot!(
+        "devin_fixture_session_table",
+        serde_json::to_string_pretty(&table_snapshot(
+            &session.rows,
+            AgentReportKind::Session,
+            &session.detected_agents,
+        ))
+        .unwrap()
+    );
+}
+
 #[test]
 fn cline_fixture_reports_all_kinds_through_unified_json_and_tables() {
     let fixture = fs_fixture!({
@@ -2114,6 +2324,8 @@ fn isolated_agents_env(
         "AMP_DATA_DIR",
         "DROID_SESSIONS_DIR",
         "CODEBUFF_DATA_DIR",
+        "DEVIN_DATA_DIR",
+        "DEVIN_SESSIONS_DIR",
         "HERMES_HOME",
         "PI_AGENT_DIR",
         "GOOSE_PATH_ROOT",

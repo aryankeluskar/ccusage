@@ -17,32 +17,16 @@ A source is a good fit when its local files include most of the following:
 
 Local transcript text alone is not enough. A transcript can be useful for debugging, but it does not reveal tokenizer behavior, hidden system context, cached input, tool-call overhead, or provider-side accounting.
 
-## Unsupported Sources Investigated
-
-::: details Why is Devin CLI not supported?
-Devin CLI usage information appears to live in Devin's cloud service rather than in a local usage log that ccusage can read. The locally available data did not provide direct access to historical token usage or costs.
-
-ccusage is a local, read-only analyzer. It does not scrape private cloud services or depend on undocumented authenticated APIs for user usage history. If Devin adds a local export with timestamps, sessions, models, and token counts, support can be revisited.
-:::
-
 ## Previously Unsupported, Now Supported
 
 ::: details Antigravity
-Antigravity is now supported as its own source. ccusage reads the local
-`gen_metadata` SQLite databases, keeps Antigravity separate from Gemini CLI,
-and maps the input, cache-read, visible-output, and thinking-token buckets into
-the standard report shape. See [Antigravity](/guide/antigravity/).
-:::
+Antigravity is now supported as its own source. ccusage reads the local `gen_metadata` SQLite databases, keeps Antigravity separate from Gemini CLI, and maps the input, cache-read, visible-output, and thinking-token buckets into the standard report shape. See [Antigravity](/guide/antigravity/). :::
 
 ::: details Grok Build CLI
-Earlier investigations looked at local Grok data that did not expose usable token
-accounting (for example SQLite without per-turn usage). Grok Build CLI is now
-supported: ccusage reads completed turns from
-`${GROK_HOME:-~/.grok}/sessions/**/updates.jsonl` (`sessionUpdate == "turn_completed"`
-with `usage` / `modelUsage`). Costs come from Grok's own `costUsdTicks`, with
-LiteLLM estimates as the fallback. In-progress turns count only after
-`turn_completed`. See [Grok Build CLI](/guide/grok/).
-:::
+Earlier investigations looked at local Grok data that did not expose usable token accounting (for example SQLite without per-turn usage). Grok Build CLI is now supported: ccusage reads completed turns from `${GROK_HOME:-~/.grok}/sessions/**/updates.jsonl` (`sessionUpdate == "turn_completed"` with `usage` / `modelUsage`). Costs come from Grok's own `costUsdTicks`, with LiteLLM estimates as the fallback. In-progress turns count only after `turn_completed`. See [Grok Build CLI](/guide/grok/). :::
+
+::: details Devin CLI
+Earlier investigation found only cloud-side usage. The current Devin CLI also writes a local SQLite sessions database at `~/.local/share/devin/cli/sessions.db` (macOS and Linux) or `%APPDATA%\devin\cli\sessions.db` (Windows): assistant messages carry input, output, cache-read, and cache-creation token counts under `metadata.metrics`, together with the model name and the API request ID. Devin CLI is now supported: ccusage counts each model response once by request ID (context rebuilds re-save earlier messages under new node IDs), prices models after also trying the name without the Devin thinking-effort suffix (`-low`, `-medium`, `-high`, `-xhigh`, `-max`), and estimates costs from LiteLLM pricing because the database records none. See [Devin CLI](/guide/devin/). :::
 
 ## Can These Be Added Later?
 

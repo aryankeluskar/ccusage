@@ -43,6 +43,7 @@ fn main() -> Result<()> {
         Command::Amp(args) => adapter::amp::run(args),
         Command::Droid(args) => adapter::droid::run(args),
         Command::Codebuff(args) => adapter::codebuff::run(args),
+        Command::Devin(args) => adapter::devin::run(args),
         Command::Hermes(args) => adapter::hermes::run(args),
         Command::Pi(args) => adapter::pi::run(args),
         Command::Goose(args) => adapter::goose::run(args),
@@ -82,12 +83,13 @@ mod tests {
 
     #[test]
     fn agent_commands_are_exposed_by_independent_crates() {
-        let runs: [fn(AgentCommandArgs) -> Result<()>; 18] = [
+        let runs: [fn(AgentCommandArgs) -> Result<()>; 19] = [
             ccusage_adapter_amp::run,
             ccusage_adapter_antigravity::run,
             ccusage_adapter_codebuff::run,
             ccusage_adapter_codex::run,
             ccusage_adapter_copilot::run,
+            ccusage_adapter_devin::run,
             ccusage_adapter_droid::run,
             ccusage_adapter_gemini::run,
             ccusage_adapter_goose::run,
@@ -103,7 +105,7 @@ mod tests {
             ccusage_adapter_cline::run,
         ];
 
-        assert_eq!(runs.len(), 18);
+        assert_eq!(runs.len(), 19);
     }
 
     #[test]

@@ -34,6 +34,8 @@ pub struct CcusageConfig {
     pub droid: Option<DroidConfig>,
     /// Codebuff configuration.
     pub codebuff: Option<CodebuffConfig>,
+    /// Devin configuration.
+    pub devin: Option<DevinConfig>,
     /// Hermes Agent configuration.
     pub hermes: Option<HermesConfig>,
     /// pi-agent configuration.
@@ -158,6 +160,22 @@ pub struct DroidCommandsConfig {
 pub struct CodebuffConfig {
     pub defaults: Option<SharedOptions>,
     pub commands: Option<CodebuffCommandsConfig>,
+}
+
+#[derive(Debug, Default, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct DevinConfig {
+    pub defaults: Option<SharedOptions>,
+    pub commands: Option<DevinCommandsConfig>,
+}
+
+#[derive(Debug, Default, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct DevinCommandsConfig {
+    pub daily: Option<SharedOptions>,
+    pub weekly: Option<SharedOptions>,
+    pub monthly: Option<SharedOptions>,
+    pub session: Option<SharedOptions>,
 }
 
 #[derive(Debug, Default, Deserialize, JsonSchema)]
@@ -1275,6 +1293,7 @@ mod tests {
                 "commands",
                 "copilot",
                 "defaults",
+                "devin",
                 "droid",
                 "gemini",
                 "antigravity",

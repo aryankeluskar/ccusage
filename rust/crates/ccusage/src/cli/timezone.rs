@@ -39,6 +39,7 @@ fn command_shared(command: &Command) -> &SharedArgs {
         | Command::Amp(args)
         | Command::Droid(args)
         | Command::Codebuff(args)
+        | Command::Devin(args)
         | Command::Hermes(args)
         | Command::Pi(args)
         | Command::Goose(args)

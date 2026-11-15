@@ -122,6 +122,7 @@ dependencies = [
  "ccusage-adapter-codex",
  "ccusage-adapter-common",
  "ccusage-adapter-copilot",
+ "ccusage-adapter-devin",
  "ccusage-adapter-droid",
  "ccusage-adapter-gemini",
  "ccusage-adapter-goose",
@@ -165,6 +166,7 @@ dependencies = [
  "ccusage-adapter-codex",
  "ccusage-adapter-common",
  "ccusage-adapter-copilot",
+ "ccusage-adapter-devin",
  "ccusage-adapter-droid",
  "ccusage-adapter-gemini",
  "ccusage-adapter-goose",
@@ -287,6 +289,18 @@ dependencies = [
  "jiff",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "ccusage-adapter-devin"
+version = "0.0.0"
+dependencies = [
+ "ccusage-adapter-common",
+ "ccusage-core",
+ "ccusage-test-support",
+ "jiff",
+ "serde_json",
+ "sqlite",
 ]
 
 [[package]]

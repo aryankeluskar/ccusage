@@ -19,6 +19,7 @@ COMMANDS:
   amp                        Show Amp token usage commands
   droid                      Show Droid usage commands
   codebuff                   Show Codebuff usage commands
+  devin                      Show Devin usage commands
   hermes                     Show Hermes usage commands
   pi                         Show pi-agent usage commands
   goose                      Show Goose usage commands
@@ -46,6 +47,7 @@ For more info, run any command with the `--help` flag:
   ccusage amp --help
   ccusage droid --help
   ccusage codebuff --help
+  ccusage devin --help
   ccusage hermes --help
   ccusage pi --help
   ccusage goose --help
